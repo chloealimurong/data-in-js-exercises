@@ -35,7 +35,8 @@ function initPollingPlaceMap(elementOrId) {
  * @returns {Promise<GeoJSON.FeatureCollection>} The polling place data.
  */
 async function getPollingPlaceData() {
-  // ... Your code here ...
+  const pollplace =  await fetch('polling_places.geojson');
+  return await pollplace.json();
 }
 
 /**
@@ -64,7 +65,9 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: (feature, layer) => {
-      layer.bindPopup(`...`);
+      const placename = feature.properties.placename;
+      const address = feature.properties.street_address;
+      layer.bindPopup(`<strong>${placename}</strong><br>${address}`);
     },
   }).addTo(map);
 

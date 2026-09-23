@@ -44,9 +44,12 @@ function initHistoricMarkerMap(elementOrId) {
 async function getHistoricMarkerData(corsproxykey, keyword, categories) {
   const philadelphiaCountyCode = 101; // FIPS code for Philadelphia County
   const philadelphiaMunicipalityCode = 1711; // Code for Philadelphia city
+  const hmdata = await fetch('https://corsproxy.io/?key=${fe879417}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=keyword&countyCode=philadelphiaCountyCode&municipalities=philadelphiaMunicipalityCode&markerCategories=markerCategories&markerMissing=')
 
+  categories.forEach();
+    hmdata += 
   // Marker data URLs look like:
-  // `https://corsproxy.io/?key=${corsproxykey}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=`
+  // `https://corsproxy.io/?key=${fe879417}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=`
   //
   // Two important notes:
   // 1. We use a CORS Proxy (https://corsproxy.io/) to avoid cross-origin
@@ -55,7 +58,6 @@ async function getHistoricMarkerData(corsproxykey, keyword, categories) {
   // 2. The `markerCategories` parameter can be repeated for multiple
   //    categories, e.g.: &markerCategories=2&markerCategories=3
 
-  // ... Your code here ...
 }
 
 /**
@@ -66,8 +68,7 @@ async function getHistoricMarkerData(corsproxykey, keyword, categories) {
  */
 async function updateHistoricMarkerLayer(layer, keyword, categories) {
   const historicMarkers = await getHistoricMarkerData(getCorsProxyKey(), keyword, categories);
-
-  // ... Your code here ...
+  return await historicMarkers.json();
 }
 
 /** Handles the form submission event to update the historic marker layer.
@@ -83,6 +84,9 @@ function onHistoricMarkerFormSubmit(evt, layer) {
   const categories = Array.from(formData.getAll('phmc-categories'));
 
   updateHistoricMarkerLayer(layer, keyword, categories);
+  const title = feature.properties.title;
+  const description = feature.properties.description;
+  layer.bindPopup(`<strong>${title}</strong><br>${description}`);
 }
 
 if (!getCorsProxyKey()) {
