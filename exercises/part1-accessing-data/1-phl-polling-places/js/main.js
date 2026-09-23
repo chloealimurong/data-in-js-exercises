@@ -35,7 +35,7 @@ function initPollingPlaceMap(elementOrId) {
  * @returns {Promise<GeoJSON.FeatureCollection>} The polling place data.
  */
 async function getPollingPlaceData() {
-  const pollplace =  await fetch('polling_places.geojson');
+  const pollplace =  await fetch('https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id');
   return await pollplace.json();
 }
 
@@ -67,7 +67,8 @@ async function initPollingPlaceLayer(map) {
     onEachFeature: (feature, layer) => {
       const placename = feature.properties.placename;
       const address = feature.properties.street_address;
-      layer.bindPopup(`<strong>${placename}</strong><br>${address}`);
+      const precinct = feature.properties.precinct;
+      layer.bindPopup(`<strong>${placename}</strong><br>${address}, ${precinct}`);
     },
   }).addTo(map);
 
