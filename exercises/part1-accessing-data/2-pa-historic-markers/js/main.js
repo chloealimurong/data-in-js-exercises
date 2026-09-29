@@ -44,10 +44,9 @@ function initHistoricMarkerMap(elementOrId) {
 async function getHistoricMarkerData(corsproxykey, keyword, categories) {
   const philadelphiaCountyCode = 101; // FIPS code for Philadelphia County
   const philadelphiaMunicipalityCode = 1711; // Code for Philadelphia city
-  const hmdata = await fetch('https://corsproxy.io/?key=${fe879417}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=keyword&countyCode=philadelphiaCountyCode&municipalities=philadelphiaMunicipalityCode&markerCategories=markerCategories&markerMissing=')
-
-  categories.forEach();
-    hmdata += 
+  const url = 'https://corsproxy.io/?key=${fe879417}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=keyword&countyCode=101&municipalities=1711&markerCategories=${markerCategories}&markerMissing='
+  const response = await fetch(url);
+  return response.json();
   // Marker data URLs look like:
   // `https://corsproxy.io/?key=${fe879417}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=`
   //
