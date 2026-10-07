@@ -60,8 +60,13 @@ const callsListElement = document.getElementById('calls-list');
  * Fetch and parse the CSV data from the API using D3
  * @returns {Array} Array of call objects
  */
-async function fetchCallsData() {
-  // ... Your code here ...
+function fetchCallsData() {
+  const rtValue = new Promise((resolve, rejct) => {
+    d3.csv(API_URL).then(data=> {
+    onDataFetched(data);
+  })
+})
+return rtValue;
 }
 
 /**
