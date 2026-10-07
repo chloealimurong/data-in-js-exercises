@@ -14,7 +14,8 @@ const DATA_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_
  * @returns {Promise<Array<Object>>} Array of GeoJSON feature objects.
  */
 async function fetchEarthquakes() {
-  // ... Your code here ...
+  const data = await d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson');
+  return data.features;
 }
 
 /**
@@ -28,7 +29,15 @@ async function fetchEarthquakes() {
  * @returns {Array<Object>} Filtered array of earthquake features.
  */
 function filterEarthquakes(earthquakes, filters = {}) {
-  // ... Your code here ...
+  return earthquakes.filter((eq) =>{
+    const mag = eq.properties.mag;
+    const depth = eq.geometry.coordinates[2];
+    return(
+      mag >= filters.minMag
+      && depth
+      && coordinates // literally didnt catch what he did here
+    )
+  })
 }
 
 /**
@@ -41,7 +50,32 @@ function filterEarthquakes(earthquakes, filters = {}) {
  * @returns {{ depths: Array<number>, magnitudes: Array<number>, counts: Array<number>, maxCount: number }}
  */
 function binEarthquakes(earthquakes, magBinCount = 10, depthBinCount = 10) {
-  // ... Your code here ...
+  const depths = [];
+  const magnitudes = [];
+  const counts = [];
+
+  const depthRange = d3.extent(earthquakes, (eq) => eq.geometry.coordinates[2]);
+  const magRange = d3.extent(earthquakes, (eq) => eq.properties.mag);
+
+  const [minDepth, maxDepth] = magRange;
+  const [minMag, maxMag] = magRange;
+
+  const magThresholds = [];
+  const depthThresholds = [];
+  const magbinSize = (maxMag - minMag) / magBinCount;
+  const depthbinSize = (maxDepth - minDepth) / depthBinCount;
+  for (let m = 0; m < magBinCount; m++){
+    magThresholds.push(m*magBinSize);
+  }
+  for (let d= 0; d< depthBinCount; d++){
+    depthThresholds.push(d*depthbinSize);
+  }
+  for (const eq of earthquakes){
+    const mag = eq.properties.mag;
+    const depth = eq.geometry.coordinates[2];
+
+    // not sure
+  }
 }
 
 export {

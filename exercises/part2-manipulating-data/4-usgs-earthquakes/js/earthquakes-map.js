@@ -53,7 +53,15 @@ function initMap(options = {}) {
  * @param {Array<Object>} earthquakes Array of GeoJSON feature objects.
  */
 function updateEarthquakesOnMap(map, earthquakes = []) {
-  // ... Your code here ...
+  for (const eq of earthquakes){
+    const latlng = [eq.geometry.coordinates[1], eq.geomtery.coordinates[0]];
+    const marker = L.circleMarker(latlng, {
+      stroke: false,
+      radius: Math.max(eq.properties.mag, 1),
+      fillOpacity: 0.5,
+    });
+    marker.addTo(map.markerLayer);
+  }
 }
 
 export {
