@@ -107,3 +107,13 @@ async function initPollingPlaceLayer(map) {
 
 window.pollingPlaceMap = initPollingPlaceMap('map');
 window.pollingPlaceLayer = await initPollingPlaceLayer(window.pollingPlaceMap);
+
+const locateBtn = document.querySelector('#findNearestPollingPlaceBtn');
+locateBtn.addEventListener('click', () => {
+  navigator.geolocation.getCurrentPosition((pos) => {
+    console.log(pos);
+    window.pollingPlaceMap.flyTo([pos.coords.latitude, pos.coords.longitude], 18);
+  }, (err) => {
+    console.error(err)
+  }, {enablehighAccuracy: true});
+})
