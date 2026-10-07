@@ -39,7 +39,9 @@ function initPollingPlaceMap(elementOrId) {
  * @returns {Promise<GeoJSON.FeatureCollection>} The deduplicated polling place data.
  */
 async function getPollingPlaceData() {
-  // ... Your code here ...
+  const pollplace =  await fetch('https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id');
+  const data = await pollplace.json();
+  return data;
 }
 
 /**
@@ -49,6 +51,7 @@ async function getPollingPlaceData() {
  */
 async function initPollingPlaceLayer(map) {
   const pollingPlaceData = await getPollingPlaceData();
+  window.pollingPlaceData = pollingPlaceData;
 
   // Create a custom icon for polling places.
   const icon = L.icon({
@@ -61,14 +64,41 @@ async function initPollingPlaceLayer(map) {
     shadowAnchor: [20, 48],
   });
 
+  const pollingPlaceFeatures = [];
+  const seenAddresses = new Set();
+  for (const precinct of pollingPlaceData.features){
+    // get the street address of polling place on the precinct
+    const address = precinct.properties.street_address;
+    // check whether the address has been seen before
+    const hasSeen = seenAddresses.has(address);
+    // const seenAddresses = pollingPlaceFeatures.map((pp) => pp.properties.street_address);
+    // const hasSeen = seenAddresses.includes(address); // gonna return true or false
+    // if not, add the polling place to the array.
+    if (!hasSeen) {
+      precinct.properties.precincts = [precinct.properties.precinct]
+      pollingPlaceFeatures.push(precinct);
+      seenAddresses.add(address);
+    }
+    // if we have, modify the polling place that exists
+    else {
+      const pollingPlace = pollingPlaceFeatures.find((pp) => pp.properties.street_address === address);
+      pollingPlace.properties.precincts.push(precinct.properties.precinct);
+    }
+
+  }
+
   // Create a GeoJSON layer with the polling place data. Override the default
   // pointToLayer function to construct markers with the custom icon.
-  const layer = L.geoJSON(pollingPlaceData, {
+  const layer = L.geoJSON(pollingPlaceFeatures, {
     pointToLayer: function (feature, latlng) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: function (feature, layer) {
-      layer.bindPopup(`...`);
+      layer.bindPopup(`
+        <p>${feature.properties.placename}</p>
+        <p>${feature.properties.street_address}</p>
+        <p>${feature.properties.precincts.join(', ')}</p>        
+        `);
     },
   }).addTo(map);
 
